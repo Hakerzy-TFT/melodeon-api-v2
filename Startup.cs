@@ -22,12 +22,14 @@ namespace melodeon_api_v2
         private readonly bool _httpsRedirect;
         private readonly string _ipAdress;
         private readonly bool _useLocalhost;
+        private readonly string _activeDatabase;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
             _appVersion = configuration["Setup:AppVersion"];
             _ipAdress = configuration["Setup:IpAdress"];
+            _activeDatabase = configuration["Setup:ActiveDatabase"];
             _httpsRedirect = bool.Parse(configuration["Setup:HttpsRedirect"]);
             _useLocalhost = bool.Parse(configuration["Setup:UseLocalhost"]);
 
@@ -71,7 +73,7 @@ namespace melodeon_api_v2
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("v1/swagger.json", "MyAPI V1");
+                    c.SwaggerEndpoint("v1/swagger.json", "Melodeon-api");
                 });
             }
 
