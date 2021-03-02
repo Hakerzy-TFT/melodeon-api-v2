@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,30 @@ namespace melodeon_api_v2
 {
     public class Startup
     {
+        private readonly string _appVersion;
+        private readonly bool _httpsRedirect;
+        private readonly string _ipAdress;
+        private readonly bool _useLocalhost;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            _appVersion = configuration["Setup:AppVersion"];
+            _ipAdress = configuration["Setup:IpAdress"];
+            _httpsRedirect = bool.Parse(configuration["Setup:HttpsRedirect"]);
+            _useLocalhost = bool.Parse(configuration["Setup:UseLocalhost"]);
+
+            /*
+             * Przyk³ad appsettings.json
+             * ...
+                 "Setup": {
+                    "AppVersion": "v1",
+                    "IpAdress": "localhost:5005",
+                    "HttpsRedirect": false,
+                    "UseLocalhost": true
+                }
+            ...
+            */
         }
 
         public IConfiguration Configuration { get; }
@@ -28,6 +50,12 @@ namespace melodeon_api_v2
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc(_appVersion, new OpenApiInfo { Title = "Melodeon-api", Version = _appVersion });
+            });
+
             services.AddDbContext<CerysContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Cerys")));
         }
 
@@ -39,7 +67,7 @@ namespace melodeon_api_v2
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
