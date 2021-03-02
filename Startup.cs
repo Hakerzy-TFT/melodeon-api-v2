@@ -56,6 +56,8 @@ namespace melodeon_api_v2
                 c.SwaggerDoc(_appVersion, new OpenApiInfo { Title = "Melodeon-api", Version = _appVersion });
             });
 
+            //todo configure CORS policy here
+
             services.AddDbContext<CerysContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Cerys")));
         }
 
@@ -65,11 +67,23 @@ namespace melodeon_api_v2
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("v1/swagger.json", "MyAPI V1");
+                });
             }
 
-            //app.UseHttpsRedirection();
+            if (_httpsRedirect) // enables https redirection
+            {
+                app.UseHttpsRedirection();
+            }
 
             app.UseRouting();
+
+            // Enables cors policy
+            // app.UseCors("MyCORS");
 
             app.UseAuthorization();
 
